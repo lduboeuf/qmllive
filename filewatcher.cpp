@@ -10,8 +10,7 @@
  * @param callback
  *   The callback function to be executed whenever changes are detected
  */
-FileWatcher::FileWatcher(std::function<void()> callback)
-: mCallback(callback)
+FileWatcher::FileWatcher(QObject *parent) : QObject(parent)
 {
     QObject::connect(&mWatcher, &QFileSystemWatcher::directoryChanged, this, &FileWatcher::directoryChanged);
     QObject::connect(&mWatcher, &QFileSystemWatcher::fileChanged, this, &FileWatcher::fileChanged);
@@ -25,7 +24,7 @@ FileWatcher::FileWatcher(std::function<void()> callback)
     mDir.setNameFilters(QStringList() << "*.qml");
 
     // connect timer to callback function
-    QObject::connect(&mTimer, &QTimer::timeout, mCallback);
+    //QObject::connect(&mTimer, &QTimer::timeout, mCallback);
 }
 
 /**
@@ -75,6 +74,11 @@ void FileWatcher::directoryChanged(const QString &path)
     addPaths();
 }
 
+QString FileWatcher::directory() const {
+    return mDir.path();
+}
+
+
 /**
  * @brief FileWatcher::fileChanged
  *   Slot connected to the fileChanged signal from internal QFileSystemWatcher
@@ -83,6 +87,21 @@ void FileWatcher::directoryChanged(const QString &path)
  */
 void FileWatcher::fileChanged(const QString &path)
 {
+    qDebug() << "changed in dir:" << path;
+//    QFile file(path);
+//    if(!file.open(QIODevice::ReadOnly)) {
+//        qWarning() << file.errorString();
+//    }
+
+//    QTextStream in(&file);
+
+//    while(!in.atEnd()) {
+//        QString line = in.readLine();
+//        qDebug() << line;
+//    }
+
+//    file.close();
     Q_UNUSED(path);
-    mTimer.start();
+    emit qmlChanged();
+    //mTimer.start();
 }

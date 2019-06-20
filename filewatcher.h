@@ -13,13 +13,18 @@ class FileWatcher : public QObject
 {
     Q_OBJECT
 public:
-    FileWatcher(std::function<void()> callback);
+    explicit FileWatcher(QObject *parent = nullptr);
 
     void setDirectory(const QString &path);
+    QString directory() const ;
+
 
 public slots:
     void directoryChanged(const QString &path);
     void fileChanged(const QString &path);
+
+signals:
+    void qmlChanged();
 
 private:
     void addPaths();

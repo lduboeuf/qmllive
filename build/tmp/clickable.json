@@ -1,0 +1,6 @@
+{
+  "template": "qmake",
+  "kill": "livecoding",
+  "build_args": "CONFIG+=UBUNTU_TOUCH"
+}
+
