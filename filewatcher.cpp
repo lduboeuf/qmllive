@@ -23,8 +23,12 @@ FileWatcher::FileWatcher(QObject *parent) : QObject(parent)
     mDir.setFilter(QDir::Files | QDir::NoSymLinks);
     mDir.setNameFilters(QStringList() << "*.qml");
 
+
     // connect timer to callback function
-    //QObject::connect(&mTimer, &QTimer::timeout, mCallback);
+    QObject::connect(&mTimer, &QTimer::timeout, [&](){
+        emit qmlChanged();
+
+    });
 }
 
 /**
@@ -40,7 +44,7 @@ void FileWatcher::addPaths()
     }
 
     mWatcher.addPaths(entries);
-    mTimer.start();
+    //mTimer.start();
 }
 
 /**
@@ -51,6 +55,7 @@ void FileWatcher::addPaths()
  */
 void FileWatcher::setDirectory(const QString &path)
 {
+    qDebug() << "added directory:" << path;
     if (!mWatcher.addPath(path))
     {
         qWarning() << "Could not add path: " << path;
@@ -60,7 +65,10 @@ void FileWatcher::setDirectory(const QString &path)
         mDir.setPath(path);
         addPaths();
     }
+    emit qmlChanged();
 }
+
+
 
 /**
  * @brief FileWatcher::directoryChanged
@@ -72,6 +80,7 @@ void FileWatcher::directoryChanged(const QString &path)
 {
     Q_UNUSED(path);
     addPaths();
+
 }
 
 QString FileWatcher::directory() const {
@@ -88,20 +97,9 @@ QString FileWatcher::directory() const {
 void FileWatcher::fileChanged(const QString &path)
 {
     qDebug() << "changed in dir:" << path;
-//    QFile file(path);
-//    if(!file.open(QIODevice::ReadOnly)) {
-//        qWarning() << file.errorString();
-//    }
-
-//    QTextStream in(&file);
-
-//    while(!in.atEnd()) {
-//        QString line = in.readLine();
-//        qDebug() << line;
-//    }
-
-//    file.close();
     Q_UNUSED(path);
-    emit qmlChanged();
-    //mTimer.start();
+    if (!mTimer.isActive()) { //prevent called twice ( on UT )
+        mTimer.start();
+    }
+
 }

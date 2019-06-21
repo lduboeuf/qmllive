@@ -5,7 +5,8 @@ QT += qml quick
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    filewatcher.cpp
+    filewatcher.cpp \
+    liveloader.cpp
 
 RESOURCES += qml.qrc
 
@@ -18,7 +19,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    filewatcher.h
+    filewatcher.h \
+    liveloader.h
 
 UBUNTU_TOUCH {
     message("building for Ubuntu Touch")

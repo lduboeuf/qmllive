@@ -15,7 +15,7 @@ class FileWatcher : public QObject
 public:
     explicit FileWatcher(QObject *parent = nullptr);
 
-    void setDirectory(const QString &path);
+    Q_INVOKABLE void setDirectory(const QString &path);
     QString directory() const ;
 
 
@@ -34,6 +34,7 @@ private:
     QFileSystemWatcher    mWatcher;
     QDir                  mDir;
     QTimer                mTimer;
+    bool    alreadyFired;
 };
 
 #endif // FILEWATCHER_H
