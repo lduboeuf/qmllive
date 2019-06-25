@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=LiveCoding
-Exec=livecoding
-Icon=assets/livecoding.png
-Terminal=false
-Type=Application
-X-Ubuntu-Touch=true
-X-Ubuntu-Supported-Orientations=portrait
-Name[en_US]=livecoding.desktop
