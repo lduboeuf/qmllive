@@ -2,5 +2,9 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>ViewWrapper.qml</file>
+        <file>assets/file.svg</file>
+        <file>assets/folder.svg</file>
+        <file>assets/help.svg</file>
+        <file>assets/back.svg</file>
     </qresource>
 </RCC>

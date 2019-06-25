@@ -16,7 +16,7 @@ FileWatcher::FileWatcher(QObject *parent) : QObject(parent)
     QObject::connect(&mWatcher, &QFileSystemWatcher::fileChanged, this, &FileWatcher::fileChanged);
 
     // configure the timer to signal the changes to the callback
-    mTimer.setInterval(100);
+    mTimer.setInterval(200);
     mTimer.setSingleShot(true);
 
     // configure directory filters
