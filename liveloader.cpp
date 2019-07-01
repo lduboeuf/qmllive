@@ -51,7 +51,7 @@ void LiveLoader::onLoadedQml(QObject *object, const QUrl &url)
         //something went wrong while loading qml file, let display the errors in a wrapper
         qDebug() << "something went wrong";
         startWrapper();
-        emit errorMsgChanged(m_errorMsg);
+        //emit errorMsgChanged(m_errorMsg);
 
     }else {
         qDebug() << "loaded:" << object->metaObject()->className();
@@ -63,6 +63,9 @@ void LiveLoader::onLoadedQml(QObject *object, const QUrl &url)
 
         created = true;
 //        for( QObject* ob: m_engine->rootObjects().first()->children()) {
+//            qDebug()<< "existing:" <<  ob->metaObject()->className();
+//        }
+//        for( QObject* ob: m_engine->rootObjects().first()->children()) {
 //            qDebug() <<  "existing object:" << ob->metaObject()->className();
 //        }
     }
@@ -72,7 +75,10 @@ void LiveLoader::loadQml()
 {
     //qDebug() << "receive notification of filewatcher:" << m_filePath;
     //m_engine->trimComponentCache();
+
+
     m_errorMsg = "";
+    emit errorMsgChanged(m_errorMsg);
     m_engine->clearComponentCache();
     if (!useWrapper){ //we delete old entries and then load the new window
 
@@ -90,9 +96,38 @@ void LiveLoader::loadQml()
 
 
         m_engine->load(m_filePath);
+    }else{
+//        //just check if Loaded item is not a Window
+//        QObject *loader = m_engine->rootObjects().first()->findChild<QObject*>("loader");
+//        for( QObject* ob: loader->children()) {
+//            qDebug()<< "existing:" <<  ob->metaObject()->className();
+//            for( QObject* obc: ob->children()) {
+//                qDebug()<< "existing:" <<  obc->metaObject()->className();
+
+//            }
+//        }
+
+//        QQuickWindow *window = loader->findChild<QQuickWindow *>();
+//        if (window) {
+//            //wrapper have a Window children, remove wrapper
+//            qDebug() << "i have a window children";
+//            QQuickWindow* window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
+//            if (window) {
+//                window->deleteLater();
+//            }
+//        }
+
     }
 
     emit qmlLoaded();
+    //qDebug() << "root elements" << m_engine->rootObjects().size();
+//    QQuickWindow* window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
+//    if (window) {
+//        qDebug() << "objectName:" << window->objectName();
+//    }
+//    for( QObject* ob: m_engine->rootObjects()) {
+//        qDebug()<< "existing:" <<  ob->metaObject()->className();
+//    }
 
 
 }

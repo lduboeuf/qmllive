@@ -8,13 +8,13 @@
 class LiveLoader : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString errorMsg READ errorMsg)
+    Q_PROPERTY(QString errorMsg MEMBER m_errorMsg NOTIFY errorMsgChanged)
 public:
     explicit LiveLoader( QQmlApplicationEngine *engine,FileWatcher *fileWatcher, QObject *parent = nullptr);
     Q_INVOKABLE void setFile(const QString &path);
 
-    QString errorMsg() const
-        { return m_errorMsg; }
+//    QString errorMsg() const
+//        { return m_errorMsg; }
 
 public slots:
 
@@ -34,7 +34,7 @@ private:
 
 signals:
     void qmlLoaded();
-    void errorMsgChanged(QString errorMsg);
+    void errorMsgChanged(QString &error);
 
 
 public slots:
