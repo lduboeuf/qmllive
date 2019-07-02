@@ -14,9 +14,16 @@ LiveLoader::LiveLoader( QQmlApplicationEngine *engine, FileWatcher *fileWatcher,
     m_fileWatcher = fileWatcher;
     m_engine = engine;
     m_engine->setOutputWarningsToStandardError(false); //don't display errors in logs
+    m_currentWindow = nullptr;
+
+    m_engine->rootContext()->setContextProperty("fileWatcher", this);
+    m_engine->rootContext()->setContextProperty("sourceUrl", m_filePath);
+
+    QQmlComponent component(m_engine, QUrl("qrc:/Errors.qml"));
+    m_errorWrapper = qobject_cast<QQuickItem*>(component.create());
 
     QObject::connect(m_fileWatcher, &FileWatcher::qmlChanged, this, &LiveLoader::loadQml);
-    QObject::connect(m_engine, &QQmlApplicationEngine::objectCreated, this, &LiveLoader::onLoadedQml);
+    //QObject::connect(m_engine, &QQmlApplicationEngine::objectCreated, this, &LiveLoader::onLoadedQml);
 
     QObject::connect(m_engine, &QQmlApplicationEngine::warnings,this, &LiveLoader::handleQmlErrors);
 
@@ -35,99 +42,85 @@ void LiveLoader::setFile(const QString &path)
     created = false;
     useWrapper = false;
 
-    m_fileWatcher->setDirectory(fi.absolutePath()); //set the directory to listen to
-
-
-
+    m_fileWatcher->setDirectory(fi.absolutePath()); //start watching directory
 
 
 }
 
-void LiveLoader::onLoadedQml(QObject *object, const QUrl &url)
-{
-    Q_UNUSED(url);
-
-    if (!object){
-        //something went wrong while loading qml file, let display the errors in a wrapper
-        qDebug() << "something went wrong";
-        startWrapper();
-        //emit errorMsgChanged(m_errorMsg);
-
-    }else {
-        qDebug() << "loaded:" << object->metaObject()->className();
-
-        QQuickWindow* window = qobject_cast<QQuickWindow*>(object);
-        if (!window) {
-            startWrapper();
-        }
-
-        created = true;
-//        for( QObject* ob: m_engine->rootObjects().first()->children()) {
-//            qDebug()<< "existing:" <<  ob->metaObject()->className();
-//        }
-//        for( QObject* ob: m_engine->rootObjects().first()->children()) {
-//            qDebug() <<  "existing object:" << ob->metaObject()->className();
-//        }
-    }
-}
 
 void LiveLoader::loadQml()
 {
-    //qDebug() << "receive notification of filewatcher:" << m_filePath;
     //m_engine->trimComponentCache();
 
 
     m_errorMsg = "";
     emit errorMsgChanged(m_errorMsg);
-    m_engine->clearComponentCache();
-    if (!useWrapper){ //we delete old entries and then load the new window
 
-        if (!m_engine->rootObjects().isEmpty()){
-//            for( QObject* ob: m_engine->rootObjects().first()->children()) {
-//                qDebug()<< "existing:" <<  ob->metaObject()->className();
-//                ob->deleteLater();
-//            }
-            QQuickWindow* window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
-            if (window) {
-                qDebug() << "destroy old item";
-                window->close();
+
+    //clean existing window if not viewWrapper
+    if (m_currentWindow && !useWrapper) {
+        qDebug() << "destroy old item";
+        delete m_currentWindow;
+    }
+
+
+    m_engine->clearComponentCache();
+    QQmlComponent component(m_engine, m_filePath);
+    QObject *item = component.create();
+    if (!item) {
+        //something went wrong
+        qDebug() << "kikou error:" << component.errorString();
+        m_errorMsg = component.errorString();
+        //start wrapper to display error
+        if (!useWrapper) startWrapper();
+    }else{
+
+        //window item ?
+        QQuickWindow* window = qobject_cast<QQuickWindow*>(item);
+        if (window){
+            //qDebug() << "i'm a window";
+            //make sure that we do not have a wrapper
+            if (useWrapper && m_currentWindow){
+                delete m_currentWindow;
+                useWrapper = false;
+                //qDebug() << "destroy wrapper";
             }
+            m_currentWindow = window;
+            QQuickItem *root = window->contentItem();
+            m_errorWrapper->setParentItem(root);
+
+        }else{
+            //qDebug() << "i'm an item";
+
+            QQuickItem *itemToDisplay = qobject_cast<QQuickItem*>(item);
+
+            if (!useWrapper) startWrapper();
+            QQuickItem *loader = m_currentWindow->findChild<QQuickItem*>("liveCodingContainer");
+
+            //any already loaded child ? -> delete them
+            for( QObject* ob: loader->childItems()) {
+                delete ob; //delete root item
+            }
+
+            itemToDisplay->setParentItem(loader);
+            //item->setParent(loader);
+
+            //            for( QObject* ob: loader->childItems()) {
+            //                   qDebug()<< "existing:" <<  ob->metaObject()->className();
+            //                   for( QObject* obc: ob->children()) {
+            //                          qDebug()<< "existing-child:" <<  obc->metaObject()->className();
+            //                   }
+            //            }
         }
 
 
-        m_engine->load(m_filePath);
-    }else{
-//        //just check if Loaded item is not a Window
-//        QObject *loader = m_engine->rootObjects().first()->findChild<QObject*>("loader");
-//        for( QObject* ob: loader->children()) {
-//            qDebug()<< "existing:" <<  ob->metaObject()->className();
-//            for( QObject* obc: ob->children()) {
-//                qDebug()<< "existing:" <<  obc->metaObject()->className();
-
-//            }
-//        }
-
-//        QQuickWindow *window = loader->findChild<QQuickWindow *>();
-//        if (window) {
-//            //wrapper have a Window children, remove wrapper
-//            qDebug() << "i have a window children";
-//            QQuickWindow* window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
-//            if (window) {
-//                window->deleteLater();
-//            }
-//        }
 
     }
 
-    emit qmlLoaded();
-    //qDebug() << "root elements" << m_engine->rootObjects().size();
-//    QQuickWindow* window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().first());
-//    if (window) {
-//        qDebug() << "objectName:" << window->objectName();
-//    }
-//    for( QObject* ob: m_engine->rootObjects()) {
-//        qDebug()<< "existing:" <<  ob->metaObject()->className();
-//    }
+
+
+    emit errorMsgChanged(m_errorMsg);
+
 
 
 }
@@ -139,17 +132,11 @@ void LiveLoader::startWrapper()
 {
     qDebug() << "start view wrapper";
     useWrapper = true;
-    m_engine->rootContext()->setContextProperty("fileWatcher", this);
-    m_engine->rootContext()->setContextProperty("sourceUrl", m_filePath);
-    m_engine->load(QUrl(QStringLiteral("qrc:/ViewWrapper.qml")));
-//    QQuickWindow* window = qobject_cast<QQuickWindow*>(m_engine->rootObjects().at(0));
-//    if (window) {
-//        QObject::connect(window, &QQuickWindow::close, [&window](){
-//            window->deleteLater();
-//        });
+    QQmlComponent component(m_engine, QUrl("qrc:/ViewWrapper.qml"));
+    QQuickWindow *object = qobject_cast<QQuickWindow*>(component.create());
+    QQmlEngine::setObjectOwnership(object, QQmlEngine::CppOwnership);
 
-//    }
-
+    m_currentWindow = object;
 }
 
 void LiveLoader::handleQmlErrors(const QList<QQmlError> &qmlErrors)

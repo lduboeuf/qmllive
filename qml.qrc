@@ -7,5 +7,6 @@
         <file>assets/help.svg</file>
         <file>assets/back.svg</file>
         <file>assets/bug.png</file>
+        <file>Errors.qml</file>
     </qresource>
 </RCC>

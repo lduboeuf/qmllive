@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QQmlApplicationEngine>
+#include <QQuickWindow>
 #include "filewatcher.h"
 
 class LiveLoader : public QObject
@@ -24,10 +25,10 @@ private:
     bool created = false;
     bool useWrapper = false;
     QQmlApplicationEngine* m_engine;
+    QQuickWindow* m_currentWindow;
+    QQuickItem* m_errorWrapper;
     FileWatcher* m_fileWatcher;
 
-
-    void onLoadedQml(QObject *object, const QUrl &url);
     void loadQml();
     void startWrapper();
 
