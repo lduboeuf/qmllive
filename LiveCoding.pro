@@ -25,6 +25,7 @@ HEADERS += \
 UBUNTU_TOUCH {
     message("building for Ubuntu Touch")
 
+    DEFINES += Q_OS_UBUNTU_TOUCH
 
     target.path = /
     click_files.path = /

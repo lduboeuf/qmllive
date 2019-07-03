@@ -21,7 +21,12 @@ int main(int argc, char *argv[])
 
     QGuiApplication app(argc, argv);
 
+#ifdef Q_OS_UBUNTU_TOUCH
     const QDir DIRECTORY(QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation)[0]);
+#else
+    const QDir DIRECTORY(QDir::homePath());
+
+#endif
     //const QUrl SOURCE_URL = QUrl::fromLocalFile(DIRECTORY.filePath("main.qml"));
 
     FileWatcher watcher;
