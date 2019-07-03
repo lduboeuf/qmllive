@@ -1,7 +1,7 @@
 # LiveCoding
-Forked from https://github.com/m4uro/LiveCoding
+Inspired by https://github.com/m4uro/LiveCoding
 
-QML Live reloading application : https://youtu.be/VqpixAm64oQ
+QML Live reloading application demo desktop and mobile ( Ubuntu Touch ) : https://youtu.be/ZiQhPCdIuWo
 
 Plug your device, launch the application, work locally with your favorite editor and see live preview on your device.
 
