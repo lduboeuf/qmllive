@@ -12,6 +12,8 @@ Plug your device, launch the application, work locally with your favorite editor
 Build for Ubuntu touch:
 `clickable -c packaging/ubuntu_touch/clickable.json`
 
+App available on OpenStore : https://open-store.io/app/me.lduboeuf.livecoding
+
 For QML examples, check out [QQC2 Gallery](https://gitlab.com/ubports/apps/qqc2-gallery) , [UITK Gallery example](https://github.com/ubports/ubuntu-ui-toolkit/tree/xenial/examples), [Kirigami Gallery (KDE)](https://gitlab.com/JBBgameich/kirigami-gallery)
 
 
