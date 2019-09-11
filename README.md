@@ -5,7 +5,7 @@ QML Live reloading application demo desktop and mobile ( Ubuntu Touch ) :
 
 [![Watch the demo](https://img.youtube.com/vi/ZiQhPCdIuWo/maxresdefault.jpg)](https://youtu.be/ZiQhPCdIuWo)
 
-
+[![Get started with QML Galleries](https://img.youtube.com/vi/FuT81xoxxBM/maxresdefault.jpg)](https://youtu.be/FuT81xoxxBM)
 
 Plug your device, launch the application, work locally with your favorite editor and see live preview on your device.
 
