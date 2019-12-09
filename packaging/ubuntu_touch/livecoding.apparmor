@@ -1,4 +1,17 @@
 {
-    "policy_groups": ["document_files_read"],
+    "policy_groups": [
+    "document_files_read",
+    "networking","audio",
+    "connectivity",
+    "video",
+    "accounts",
+    "camera",
+    "content_exchange",
+    "content_exchange_source",
+    "keep-display-on",
+    "location",
+    "microphone",
+    "sensors"
+    ],
     "policy_version": 16.04
 }
